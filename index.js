@@ -1,42 +1,33 @@
-const argv = require("yargs").argv;
+const express = require("express");
+const morgan = require("morgan");
+const path = require("path");
+const config = require("./config");
+const { send } = require("process");
+const usersRouter = require("./routers/contacts-router.js");
 
-const {
-  contactsPath,
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-} = require("./contacts.js");
+const app = express();
+const port = 3000;
 
-const contacts = require("./db/contacts.json");
+app.use(morgan("tiny"));
+app.use(express.urlencoded());
+app.use(express.json());
 
-function invokeAction({ action, id, name, email, phone }) {
-  switch (action) {
-    case "list":
-      listContacts().then((data) => console.table(data));
-      break;
+app.use("/", usersRouter);
+// app.get("/", (request, response) => {
+//   response.send("Hello from Express!");
+// });
 
-    case "get":
-      getContactById(id)
-        .then((data) => console.table(data))
-        .catch((err) => console.log("some error:", err));
-      break;
-
-    case "add":
-      addContact(name, email, phone)
-        .then((data) => console.table(data))
-        .catch((err) => console.log("some error:", err));
-      break;
-
-    case "remove":
-      removeContact(id)
-        .then((data) => console.table(data))
-        .catch((err) => console.log("some error:", err));
-      break;
-
-    default:
-      console.warn("Unknown action type!");
+app.use((err, req, res, next) => {
+  if (err) {
+    return res.status(500).send(err);
   }
-}
 
-invokeAction(argv);
+  next();
+});
+
+app.listen(config.port, (err) => {
+  if (err) {
+    return console.log("something bad happened", err);
+  }
+  console.log(`server is listening on ${port}`);
+});
