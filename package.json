@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --inspect ./index.js localhost:80",
-    "start": "node index.js"
+    "dev": "nodemon --inspect ./index2.js localhost:80",
+    "start": "node index2.js"
   },
   "repository": {
     "type": "git",
