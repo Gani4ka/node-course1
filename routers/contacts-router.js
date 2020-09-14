@@ -22,14 +22,14 @@ router.post("/", async (req, res) => {
 });
 
 router.delete("/:id", async (req, res) => {
-  const id = Number(req.params.id);
+  const id = req.params.id;
 
   const result = await contactsRouterController.removeContact(id);
   res.status(result.status).send(result.data);
 });
 
 router.patch("/:id", async (req, res) => {
-  const id = Number(req.params.id);
+  const id = req.params.id;
   const body = req.body;
 
   const result = await contactsRouterController.updateContact(id, body);

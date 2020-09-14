@@ -26,52 +26,51 @@ async function getContactById(contactId) {
 }
 
 async function removeContact(contactId) {
-  const data = await listContacts();
+  try {
+    const contact = await contactsModel.findById(contactId);
 
-  const isContactExsist = data.find((el) => el.id === contactId);
-  if (isContactExsist) {
-    const newContacts = data.filter((el) => el.id !== contactId);
-    const newContactsJson = JSON.stringify(newContacts);
-    await fsPromise.writeFile(contactsPath, newContactsJson);
-    return await listContacts();
-  } else return null;
+    if (!contact) return null;
+
+    contact.remove();
+    return contact;
+  } catch (e) {
+    console.error(e);
+    return e;
+  }
 }
 
 async function addContact(name, email, phone) {
-  const data = await listContacts();
-  const newContactId =
-    data.map((contact) => contact.id).sort((a, b) => a - b)[data.length - 1] +
-    1;
+  try {
+    const contact = await contactsModel.create({
+      name: name,
+      email: email,
+      phone: phone,
+    });
 
-  const newContact = {
-    id: newContactId,
-    name: name,
-    email: email,
-    phone: phone,
-  };
-  const newContactsJson = JSON.stringify([...data, newContact]);
-  await fsPromise.writeFile(contactsPath, newContactsJson);
-  return await listContacts();
+    if (!contact) return null;
+    return contact;
+  } catch (e) {
+    console.error(e);
+    return e;
+  }
 }
 
 async function updateContact(id, obj) {
-  const data = await listContacts();
-  const contactToUpdate = data.findIndex((contact) => contact.id === id);
+  try {
+    const contact = await contactsModel.findById(id);
 
-  if (!contactToUpdate) return null;
+    if (!contact) return null;
 
-  const updatedData = data.map((contact) => {
-    if (contact.id === id) {
-      Object.keys(obj).map((key) => (contact[key] = obj[key]));
-      return contact;
-    }
-    return contact;
-  });
+    Object.keys(obj).forEach((key) => {
+      contact[key] = obj[key];
+    });
 
-  const newContactsJson = JSON.stringify(updatedData);
-  await fsPromise.writeFile(contactsPath, newContactsJson);
-
-  return await getContactById(id);
+    await contact.save();
+    return await contact;
+  } catch (e) {
+    console.error(e);
+    return e;
+  }
 }
 
 module.exports = {
