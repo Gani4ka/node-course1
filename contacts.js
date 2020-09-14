@@ -1,21 +1,28 @@
 const fs = require("fs");
 const path = require("path");
-
+const contactsModel = require("./db/Scema");
 const fsPromise = fs.promises;
 
 const contactsPath = path.join(__dirname, "db", "contacts.json");
 
 async function listContacts() {
-  const data = await fsPromise
-    .readFile(contactsPath, "utf-8")
-    .then((data) => JSON.parse(data));
-  return data;
+  try {
+    const users = await contactsModel.find();
+    return users;
+  } catch (e) {
+    console.error(e);
+    return e;
+  }
 }
 
 async function getContactById(contactId) {
-  const data = await listContacts();
-  const contact = data.find((el) => el.id === contactId);
-  return contact;
+  try {
+    const data = await contactsModel.findById(contactId);
+    return data;
+  } catch (e) {
+    console.error(e);
+    return e;
+  }
 }
 
 async function removeContact(contactId) {

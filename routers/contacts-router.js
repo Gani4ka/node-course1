@@ -9,7 +9,7 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
-  const id = Number(req.params.id);
+  const id = req.params.id;
   const contact = await contactsRouterController.getUserById(id);
   res.status(contact.status).send(contact.data);
 });
