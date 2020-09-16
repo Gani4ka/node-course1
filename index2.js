@@ -4,27 +4,38 @@ const path = require("path");
 const config = require("./config");
 const { send } = require("process");
 const contactsRouter = require("./routers/contacts-router.js");
+const connection = require("./db/Connection");
 
 const app = express();
 const port = 3000;
 
-app.use(morgan("tiny"));
-app.use(express.urlencoded());
-app.use(express.json());
+async function main() {
+  await connection.connect();
 
-app.use("/", contactsRouter);
+  app.use(morgan("tiny"));
+  app.use(express.urlencoded());
+  app.use(express.json());
 
-app.use((err, req, res, next) => {
-  if (err) {
-    return res.status(500).send(err);
-  }
+  app.use("/", contactsRouter);
 
-  next();
-});
+  app.use((err, req, res, next) => {
+    if (err) {
+      return res.status(500).send(err);
+    }
 
-app.listen(config.port, (err) => {
-  if (err) {
-    return console.log("something bad happened", err);
-  }
-  console.log(`server is listening on ${port}`);
-});
+    next();
+  });
+
+  app.listen(config.port, (err) => {
+    if (err) {
+      return console.log("something bad happened", err);
+    }
+    console.log(`server is listening on ${port}`);
+  });
+
+  process.on("SIGINT", () => {
+    connection.close();
+  });
+}
+
+main().catch(console.error);

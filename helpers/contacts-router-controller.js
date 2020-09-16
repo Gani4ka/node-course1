@@ -1,6 +1,3 @@
-const joi = require("joi");
-const validate = require("../helpers/validator.js");
-
 const {
   contactsPath,
   listContacts,
@@ -55,77 +52,37 @@ class contactsRouterController {
   }
 
   async postContact(data) {
-    const schema = joi.object({
-      name: joi.string().min(3).required(),
-      email: joi.string().required(),
-      phone: joi.string().min(7).required(),
-    });
+    const { name, email, phone } = data;
 
-    const validation = validate(schema, data);
+    this.result = await addContact(name, email, phone);
 
-    if (validation) {
-      const { name, email, phone } = data;
-
-      this.result = await addContact(name, email, phone).then(
-        (data) => data[data.length - 1]
-      );
-
-      if (this.result)
-        return {
-          data: JSON.stringify(this.result),
-          status: 201,
-        };
-      else {
-        return {
-          data: JSON.stringify({
-            message: "smth wrong",
-          }),
-          status: 400,
-        };
-      }
-    } else {
+    if (this.result.errors || this.result instanceof Error)
       return {
         data: JSON.stringify({
-          message: "missing required name field or not valid data",
+          message: this.result.errors,
         }),
         status: 400,
+      };
+    else {
+      return {
+        data: JSON.stringify(this.result),
+        status: 201,
       };
     }
   }
 
   async updateContact(id, data) {
-    if (Object.keys(data).length === 0) {
+    this.result = await updateContact(id, data);
+
+    if (!this.result || this.result.errors || this.result instanceof Error)
       return {
-        data: JSON.stringify({ message: "missing fields" }),
-        status: 400,
+        data: JSON.stringify(this.result.errors + this.result.message),
+        status: 404,
       };
-    }
-
-    const schema = joi.object({
-      name: joi.string().min(3),
-      email: joi.string(),
-      phone: joi.string().min(7),
-    });
-
-    const validation = validate(schema, data);
-
-    if (validation) {
-      this.result = await updateContact(id, data);
-
-      if (this.result)
-        return {
-          data: JSON.stringify(this.result),
-          status: 200,
-        };
-      else
-        return {
-          data: JSON.stringify({ message: "no such user" }),
-          status: 404,
-        };
-    } else
+    else
       return {
-        data: JSON.stringify({ message: "failed fields validation" }),
-        status: 400,
+        data: JSON.stringify(this.result),
+        status: 200,
       };
   }
 }
