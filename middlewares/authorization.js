@@ -6,7 +6,6 @@ const validate = require("../helpers/validator");
 module.exports = async (req, res, next) => {
   try {
     const token = req.headers["access-token"];
-    console.log("token", token);
 
     if (token) {
       validate(joi.string().min(20).required(), token);
@@ -21,7 +20,7 @@ module.exports = async (req, res, next) => {
         (userToken) => userToken.token === token
       );
 
-      jwt.decode(tokenRecord.token, "test");
+      jwt.verify(tokenRecord.token, "test");
 
       req.user = user;
     } else {

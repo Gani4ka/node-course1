@@ -35,7 +35,6 @@ class usersRouterController {
     this.result = await getUser(email, password);
 
     if (this.result instanceof Error && this.result.errors) {
-      console.log("here1", this.result.errors);
       return {
         data: JSON.stringify({
           message: this.result.errors,
@@ -43,7 +42,6 @@ class usersRouterController {
         status: 400,
       };
     } else if (this.result instanceof Error && this.result.message) {
-      console.log("here2", this.result instanceof Error);
       return {
         data: JSON.stringify({
           message: this.result.message,
