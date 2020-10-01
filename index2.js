@@ -1,9 +1,8 @@
 const express = require("express");
 const morgan = require("morgan");
-const path = require("path");
 const config = require("./config");
-const { send } = require("process");
 const contactsRouter = require("./routers/contacts-router.js");
+const usersRouter = require("./routers/users-router.js");
 const connection = require("./db/Connection");
 
 const app = express();
@@ -17,6 +16,8 @@ async function main() {
   app.use(express.json());
 
   app.use("/", contactsRouter);
+
+  app.use("/auth", usersRouter);
 
   app.use((err, req, res, next) => {
     if (err) {
