@@ -28,6 +28,7 @@ const UsersSchema = new mongoose.Schema({
       token: { type: String, required: true },
     },
   ],
+  avatarURL: String,
 });
 
 UsersSchema.method("generateAndSaveToken", async function () {
