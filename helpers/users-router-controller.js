@@ -100,21 +100,21 @@ class usersRouterController {
   async patchUser(id, payload) {
     this.result = await updateUser(id, payload);
 
-    if (this.result instanceof Error && this.result.errors)
+    if (this.result instanceof Error && this.result.errors) {
       return {
         data: JSON.stringify({
           message: this.result.errors || this.result.message,
         }),
         status: 400,
       };
-    else if (this.result instanceof Error && this.result.message)
+    } else if (this.result instanceof Error && this.result.message) {
       return {
         data: JSON.stringify({
           message: this.result.message,
         }),
         status: 409,
       };
-
+    }
     return {
       data: JSON.stringify({
         userId: this.result.id,

@@ -3,6 +3,7 @@ const uuid = require("uuid").v4;
 const path = require("path");
 const jdenticon = require("jdenticon");
 const { promises: fsPromises } = require("fs");
+const config = require("./config");
 
 const usersModel = require("./db/ScemaUsers");
 
@@ -18,12 +19,7 @@ async function addUser(email, password) {
 
       const png = jdenticon.toPng(value, size);
 
-      const avatar = path.join(
-        __dirname.replace("routers", ""),
-        "public",
-        "images",
-        `${uuid()}.png`
-      );
+      const avatar = path.join(config.avatarsPath, `${uuid()}.png`);
       await fsPromises.writeFile(avatar, png);
 
       const user = await usersModel.create({
