@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const multer = require("../helpers/multer");
 
 const usersRouterController = require("../helpers/users-router-controller");
 const authCheck = require("../middlewares/authorization");
@@ -31,5 +32,18 @@ router.get("/current", authCheck, async (req, res) => {
   const result = await usersRouterController.getCurrentUser(id);
   res.status(result.status).send(result.data);
 });
+
+router.patch(
+  "/avatars",
+  authCheck,
+  multer.single("avatar"),
+  async (req, res) => {
+    const user = req.user;
+    const payload = req.file.path;
+
+    const result = await usersRouterController.patchUser(user.id, payload);
+    res.status(result.status).send(result.data);
+  }
+);
 
 module.exports = router;

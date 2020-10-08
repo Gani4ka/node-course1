@@ -1,5 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
+const path = require("path");
 const config = require("./config");
 const contactsRouter = require("./routers/contacts-router.js");
 const usersRouter = require("./routers/users-router.js");
@@ -18,6 +19,8 @@ async function main() {
   app.use("/", contactsRouter);
 
   app.use("/auth", usersRouter);
+
+  app.use("/", express.static(path.join(__dirname, "public")));
 
   app.use((err, req, res, next) => {
     if (err) {

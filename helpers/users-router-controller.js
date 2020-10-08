@@ -1,4 +1,4 @@
-const { addUser, getUser } = require("../users.js");
+const { addUser, getUser, updateUser } = require("../users.js");
 const usersModel = require("../db/ScemaUsers");
 
 class usersRouterController {
@@ -92,6 +92,33 @@ class usersRouterController {
         userId: user.id,
         email: user.email,
         subscription: user.subscription,
+      }),
+      status: 200,
+    };
+  }
+
+  async patchUser(id, payload) {
+    this.result = await updateUser(id, payload);
+
+    if (this.result instanceof Error && this.result.errors) {
+      return {
+        data: JSON.stringify({
+          message: this.result.errors || this.result.message,
+        }),
+        status: 400,
+      };
+    } else if (this.result instanceof Error && this.result.message) {
+      return {
+        data: JSON.stringify({
+          message: this.result.message,
+        }),
+        status: 409,
+      };
+    }
+    return {
+      data: JSON.stringify({
+        userId: this.result.id,
+        avatarUrl: this.result.avatarURL,
       }),
       status: 200,
     };
