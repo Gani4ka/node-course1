@@ -5,6 +5,7 @@ const config = require("./config");
 const contactsRouter = require("./routers/contacts-router.js");
 const usersRouter = require("./routers/users-router.js");
 const connection = require("./db/Connection");
+const Mailer = require("./helpers/mailer");
 
 const app = express();
 const port = 3000;
@@ -40,6 +41,8 @@ async function main() {
   process.on("SIGINT", () => {
     connection.close();
   });
+
+  // Mailer.sendMailFromSupport({ to: 'anna.efimova881@gmail.com', subject: 'subject', text: 'text' }) 
 }
 
 main().catch(console.error);

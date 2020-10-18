@@ -28,7 +28,6 @@ router.delete("/:id", authCheck, async (req, res) => {
 
 router.get("/current", authCheck, async (req, res) => {
   const id = req.user.id;
-
   const result = await usersRouterController.getCurrentUser(id);
   res.status(result.status).send(result.data);
 });
@@ -42,6 +41,15 @@ router.patch(
     const payload = req.file.path;
 
     const result = await usersRouterController.patchUser(user.id, payload);
+    res.status(result.status).send(result.data);
+  }
+);
+
+router.get(
+  "/verify/:verificationToken", async (req, res) => {
+    const token = req.params.verificationToken;
+  
+    const result = await usersRouterController.verifyEmail(token);
     res.status(result.status).send(result.data);
   }
 );
