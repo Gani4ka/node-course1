@@ -123,6 +123,30 @@ class usersRouterController {
       status: 200,
     };
   }
+
+  async verifyEmail(token) {
+    const user = await usersModel.findByVerificationToken(
+      token,
+    );
+
+    if (!user) {
+      return {
+        data: {
+          message: 'no user found',
+        },
+        status: 400,
+      };
+    }
+
+    const result = await usersModel.verifyUserEmail(user._id);
+
+    return {
+      data: JSON.stringify({
+        userId: result.id
+      }),
+      status: 200,
+    };
+  }
 }
 
 module.exports = new usersRouterController();

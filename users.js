@@ -4,7 +4,7 @@ const path = require("path");
 const jdenticon = require("jdenticon");
 const { promises: fsPromises } = require("fs");
 const config = require("./config");
-
+const Mailer = require("./helpers/mailer");
 const usersModel = require("./db/ScemaUsers");
 
 async function addUser(email, password) {
@@ -12,6 +12,8 @@ async function addUser(email, password) {
     const isUserExist = await usersModel.find({ email });
 
     if (isUserExist.length === 0) {
+      const verificationToken = await sendVerificationEmail(email);
+
       const hash = bcrypt.hashSync(password, 10);
 
       const size = 200;
@@ -26,6 +28,7 @@ async function addUser(email, password) {
         email: email,
         password: hash,
         avatarURL: avatar,
+        verificationToken
       });
 
       if (!user) return null;
@@ -36,6 +39,18 @@ async function addUser(email, password) {
     return e;
   }
 }
+
+async function sendVerificationEmail(email) {
+  const verificationToken = uuid();
+
+  Mailer.sendVerificationEmail({ 
+    to: email, 
+    subject: 'verification',
+    text: 'verification',
+    html: `<a href="localhost:3000/auth/verify/${verificationToken}">Click here or go by link localhost:3000/auth/verify/${verificationToken}</a>`
+}) 
+  return verificationToken;
+};
 
 async function getUser(email, password) {
   try {

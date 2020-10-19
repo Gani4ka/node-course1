@@ -28,6 +28,7 @@ const UsersSchema = new mongoose.Schema({
       token: { type: String, required: true },
     },
   ],
+  verificationToken: String,
   avatarURL: String,
 });
 
@@ -48,6 +49,22 @@ UsersSchema.method("deleteToken", async function () {
     { strict: true }
   );
   return;
+});
+
+UsersSchema.static('findByVerificationToken', async function (
+  verificationToken,
+) {
+  return this.findOne({
+    verificationToken,
+  });
+});
+
+UsersSchema.static('verifyUserEmail', async function (userId) {
+  return this.findByIdAndUpdate(
+    userId,
+    { verificationToken: null },
+    { strict: true },
+  );
 });
 
 UsersSchema.pre("save", function () {
